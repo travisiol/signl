@@ -1,0 +1,85 @@
+import { dashboardStats, LIVE_DATA_ENABLED } from "@/lib/data";
+import { DemoBadge } from "./ui/DemoBadge";
+
+function formatUsd(value: number) {
+  return `$${value.toLocaleString("en-US")}`;
+}
+
+const cards = [
+  {
+    label: "Total Distributed",
+    value: formatUsd(dashboardStats.totalDistributedUsd),
+  },
+  {
+    label: "Total Volume",
+    value: formatUsd(dashboardStats.totalVolumeUsd),
+  },
+  {
+    label: "SIGNL Holders",
+    value: dashboardStats.holders.toLocaleString("en-US"),
+  },
+  {
+    label: "Transactions",
+    value: dashboardStats.transactions.toLocaleString("en-US"),
+  },
+];
+
+/**
+ * Pre-launch stat placeholder: an animated "loading" bar instead of a
+ * numeric value. This is intentional — we don't have real data yet, and we
+ * don't fabricate any (see product principle in README / lib/data.ts).
+ * Showing "awaiting launch" reads as a live product waiting on real data,
+ * without ever claiming a number that isn't true.
+ */
+function PendingStat() {
+  return (
+    <div className="mt-3">
+      <div className="h-8 w-28 animate-shimmer rounded-md bg-[linear-gradient(90deg,rgba(255,255,255,0.04)_25%,rgba(14,165,233,0.18)_50%,rgba(255,255,255,0.04)_75%)] bg-[length:200%_100%]" />
+      <p className="mt-2 flex items-center gap-1.5 text-[10px] font-semibold uppercase tracking-wider text-signal-500/70">
+        <span className="h-1 w-1 rounded-full bg-signal-500/70 animate-pulse" />
+        Awaiting launch
+      </p>
+    </div>
+  );
+}
+
+export function StatsDashboard() {
+  return (
+    <section
+      id="dashboard"
+      className="mx-auto max-w-6xl px-5 pb-6 pt-16 sm:px-8 sm:pt-20"
+    >
+      <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="font-serif text-2xl text-platinum">Live Dashboard</h2>
+        {!LIVE_DATA_ENABLED && (
+          <DemoBadge label="Not yet live — awaiting chain data" />
+        )}
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {cards.map((card) => (
+          <div
+            key={card.label}
+            className="rounded-2xl border border-line bg-ink-soft/60 p-6"
+          >
+            <p className="text-xs font-medium uppercase tracking-wider text-platinum/50">
+              {card.label}
+            </p>
+            {LIVE_DATA_ENABLED ? (
+              <p className="mt-3 font-mono text-3xl text-signal-300">
+                {card.value}
+              </p>
+            ) : (
+              <PendingStat />
+            )}
+          </div>
+        ))}
+      </div>
+      <p className="mt-4 text-xs text-platinum/40">
+        This dashboard goes live with real, independently verifiable onchain
+        data the moment {"$SIGNL"} launches and the payout mechanism is
+        active — nothing here is invented in the meantime.
+      </p>
+    </section>
+  );
+}
